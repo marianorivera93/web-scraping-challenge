@@ -7,21 +7,20 @@ app = Flask(__name__)
 conn = 'mongodb://localhost:27017'
 client=pymongo.MongoClient(conn)
 
-#create db
 db=client.mars_db
 
 @app.route("/")
 def home():
 
-    mars_results = db.mars_results.find()
-    return render_template ("index.html", mars_results=mars_results)
+    mars_results = db.mars_results.find_one()
+    return render_template("index.html", mars_results=mars_results)
 
 #webscraping
 @app.route("/scrape")
 def scraper():
     mars_data=scrape_mars.scrape()
 
-    db.mars_results.insert_one(mars_data)
+    db.mars_results.update({},mars_data,upsert=True)
 
     return redirect("/")
 
